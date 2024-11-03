@@ -1,0 +1,2 @@
+# ggstruct
+Golang Generic Structures
