@@ -1,149 +1,166 @@
 package trie
 
 import (
-	"fmt"
-
 	"github.com/HoskeOwl/ggstruct/stack"
+	"maps"
+	"slices"
 )
 
 type (
 	Trie[V any] struct {
-		root *node[V]
-		size int
+		root     *node[V]
+		valueLen int
+		nodesLen int
 	}
 	node[V any] struct {
 		key   rune
 		value *V
-		leaf  map[rune]*node[V]
-		prev  *node[V]
+		leafs map[rune]*node[V]
+		//weights map[rune]int|float
+		prev *node[V]
 	}
 )
 
+func (n *node[V]) Clear() {
+	n.value = nil
+	n.prev = nil
+	n.leafs = nil
+}
+
+func newNode[V any](key rune, prev *node[V]) *node[V] {
+	return &node[V]{
+		key:   key,
+		value: nil,
+		leafs: make(map[rune]*node[V]),
+		prev:  prev,
+	}
+}
+
+func NewFromMap[V any](values map[string]V) *Trie[V] {
+	t := &Trie[V]{
+		root:     newNode[V](rune(0), nil),
+		valueLen: 0,
+		nodesLen: 0,
+	}
+	for k, v := range values {
+		t.Insert(k, v)
+	}
+	return t
+}
+
 func New[V any]() *Trie[V] {
-	return &Trie[V]{nil, 0}
-}
-func (this *Trie[V]) newNode(key rune, prev *node[V]) *node[V] {
-	return &node[V]{key, nil, make(map[rune]*node[V]), prev}
-}
-func (this *Trie[V]) Get(key string) (res V, exists bool) {
-	if this.size == 0 {
-		exists = false
-		return
+	return &Trie[V]{
+		root:     newNode[V](rune(0), nil),
+		valueLen: 0,
+		nodesLen: 0,
 	}
+}
 
-	cur := this.root
+func (t *Trie[V]) getNode(key string) *node[V] {
+	cur := t.root
 	for _, r := range key {
-		if node, e := cur.leaf[r]; e {
-			cur = node
+		if n, e := cur.leafs[r]; e {
+			cur = n
 		} else {
-			exists = false
+			return nil
 		}
 	}
-	res = *cur.value
-	exists = true
-	return
+	return cur
 }
-func (this *Trie[V]) Has(key string) bool {
-	_, exists := this.Get(key)
-	return exists
-}
-func (this *Trie[V]) Insert(key string, value V) {
-	if this.size == 0 {
-		this.root = this.newNode(rune(0), nil)
-	}
 
-	cur := this.root
+func (t *Trie[V]) Insert(key string, value V) {
+	cur := t.root
 	for _, r := range key {
-		if node, exists := cur.leaf[r]; exists {
-			cur = node
+		if n, exists := cur.leafs[r]; exists {
+			cur = n
 		} else {
-			node = this.newNode(r, cur)
-			cur.leaf[r] = node
-			cur = node
+			n = newNode(r, cur)
+			cur.leafs[r] = n
+			cur = n
+			t.nodesLen++
 		}
-	}
-	if cur.value == nil {
-		this.size++
 	}
 	cur.value = &value
+	t.valueLen++
 }
-func (this *Trie[V]) Len() int {
-	return this.size
+
+func (t *Trie[V]) Search(key string) (res V, exists bool) {
+	n := t.getNode(key)
+	if n == nil {
+		exists = false
+		return
+	}
+	if n.value == nil {
+		exists = false
+		return
+	}
+	return *n.value, true
 }
-func (this *Trie[V]) Remove(key string) (res V, exists bool) {
-	if this.size == 0 {
+
+func (t *Trie[V]) Has(key string) bool {
+	_, exists := t.Search(key)
+	return exists
+}
+
+func (t *Trie[V]) Len() int {
+	return t.valueLen
+}
+
+func (t *Trie[V]) NodeLen() int {
+	return t.nodesLen
+}
+
+func (t *Trie[V]) Remove(key string) (res V, exists bool) {
+	if t.valueLen == 0 {
 		exists = false
 		return
 	}
 
-	cur := this.root
-
-	for _, r := range key {
-		if node, e := cur.leaf[r]; e {
-			cur = node
-		} else {
-			exists = false
-			return
-		}
-	}
-
-	if cur.value != nil {
-		this.size--
-		cur.value = nil
-	} else {
-		res = *cur.value
-	}
-
-	exists = true
-
-	//cleanup
-	var prev *node[V]
-	var k rune
-	for cur != this.root {
-		if cur.value == nil {
-			prev = cur.prev
-			k = cur.key
-			cur.prev = nil
-			cur.value = nil
-			delete(prev.leaf, k)
-			cur = prev
-		} else {
-			return
-		}
-	}
-	return
-}
-func (this *Trie[V]) String() string {
-	str := "{"
-	i := 0
-	this.Do(func(k string, v V) bool {
-		if i > 0 {
-			str += ", "
-		}
-		str += fmt.Sprint(k, ":", v)
-		i++
-		return true
-	})
-	str += "}"
-	return str
-}
-func (this *Trie[V]) Do(handler func(string, V) bool) {
-	if this.size == 0 {
+	cur := t.getNode(key)
+	if cur == nil || cur.value == nil {
+		exists = false
 		return
 	}
 
-	var n *node[V]
-	nodes := stack.New[*node[V]]()
-	nodes.Push(this.root)
-	for nodes.Len() > 0 {
-		n, _ = nodes.Pop()
-		if n.value != nil {
-			if !handler(string(n.key), *n.value) {
-				return
-			}
-		}
-		for _, ln := range n.leaf {
-			nodes.Push(ln)
+	res = *cur.value
+	cur.value = nil
+	t.valueLen--
+	exists = true
+
+	if len(cur.leafs) > 0 {
+		// keep for leafs
+		t.valueLen--
+		return
+	}
+
+	for {
+		rm := cur
+		cur = cur.prev
+		delete(cur.leafs, rm.key)
+		t.nodesLen--
+		rm.Clear()
+		if cur == t.root || len(cur.leafs) != 0 || cur.value != nil {
+			return
 		}
 	}
+}
+
+func (t *Trie[V]) Clear() {
+	if t.valueLen == 0 {
+		return
+	}
+
+	s := stack.New[*node[V]](slices.Collect(maps.Values(t.root.leafs))...)
+	for !s.IsEmpty() {
+		n, exists := s.Pop()
+		if !exists {
+			return
+		}
+		for _, v := range n.leafs {
+			s.Push(v)
+		}
+		n.Clear()
+	}
+	t.valueLen = 0
+	t.nodesLen = 0
 }

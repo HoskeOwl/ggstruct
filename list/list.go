@@ -1,28 +1,29 @@
 package list
 
-import "iter"
+import (
+	"iter"
+)
 
-type listNode[NT any] struct {
+type element[NT comparable] struct {
 	data NT
-	prev *listNode[NT]
-	next *listNode[NT]
+	prev *element[NT]
+	next *element[NT]
 }
 
-func (n *listNode[NT]) Clear() {
+func (n *element[NT]) clear() {
 	n.next = nil
 	n.prev = nil
 }
 
-type List[LT any] struct {
-	start *listNode[LT]
-	end   *listNode[LT]
-	cnt   int
+type List[LT comparable] struct {
+	root *element[LT]
+	cnt  int
 }
 
-func New[LT any](data ...LT) *List[LT] {
+func New[LT comparable](data ...LT) *List[LT] {
 	l := &List[LT]{}
 	for _, d := range data {
-		l.AddRight(d)
+		l.PushBack(d)
 	}
 	return l
 }
@@ -31,203 +32,378 @@ func (l *List[LT]) Len() int {
 	return l.cnt
 }
 
-func (l *List[LT]) AsSlice() []LT {
-	if l.start == nil {
-		return nil
-	}
-
-	res := make([]LT, 0, l.cnt)
-	n := l.start
-
-	for ; n != nil; n = n.next {
-		res = append(res, n.data)
-	}
-
-	return res
-}
-
 func (l *List[LT]) Clear() {
-	if l.start == nil {
+	if l.root == nil {
 		return
 	}
-	var cur *listNode[LT]
-	var next *listNode[LT]
-	ok := true
-	for ok {
-		cur = l.start
-		next = cur.next
-		cur.Clear()
-		cur = next
-		ok = cur != nil
+
+	e := l.root
+	var next *element[LT]
+	for i := 0; i < l.cnt; i++ {
+		next = e.next
+		e.clear()
+		e = next
 	}
-	return
 }
 
-func (l *List[LT]) Range() iter.Seq[LT] {
+func (l *List[LT]) Seq() iter.Seq[LT] {
 	return func(yield func(LT) bool) {
-		if l.start == nil {
+		if l.root == nil {
 			return
 		}
-		var cur *listNode[LT]
-		ok := true
-		for ok {
-			cur = l.start
+		cur := l.root
+		for i := 0; i < l.cnt; i++ {
 			if !yield(cur.data) {
 				return
 			}
 			cur = cur.next
-			ok = cur != nil
 		}
 		return
 	}
 }
 
-func (l *List[T]) AddLeft(value T) {
-	newNode := &listNode[T]{data: value, next: l.start, prev: nil}
-	if l.start == nil {
-		l.start = newNode
-		l.end = newNode
-		l.cnt += 1
-		return
-	}
-
-	l.cnt += 1
-	l.start.prev = newNode
-	l.start = newNode
-	return
-}
-
-func (l *List[T]) AddRight(value T) {
-	newNode := &listNode[T]{data: value, next: nil, prev: l.end}
-	if l.start == nil {
-		l.start = newNode
-		l.end = newNode
-		l.cnt += 1
-		return
-	}
-
-	l.cnt += 1
-	l.end.next = newNode
-	l.end = newNode
-	return
-}
-
-func (l *List[T]) AddIndex(value T, index int) {
-	/*
-		if index is the last element - add before them
-		if index is the next of the last - add to the end
-	*/
-
-}
-
-func (l *List[T]) PopLeft() (value T, exists bool) {
-	if l.start == nil {
-		return
-	}
-	exists = true
-	value = l.start.data
-	switch l.cnt {
-	case 1:
-		l.start.Clear()
-		l.start = nil
-		l.end = nil
-	case 2:
-		l.start.Clear()
-		l.start = l.end
-	default:
-		old := l.start
-		l.start = l.start.next
-		l.start.prev = nil
-		// prevent memory leaks - clear all links
-		old.Clear()
-	}
-	l.cnt -= 1
-	return
-}
-
-func (l *List[T]) PopRight() (value T, exists bool) {
-	if l.end == nil {
-		return
-	}
-	exists = true
-	value = l.end.data
-	switch l.cnt {
-	case 1:
-		l.start.Clear()
-		l.start = nil
-		l.end = nil
-	case 2:
-		l.end.Clear()
-		l.end = l.start
-	default:
-		old := l.end
-		l.end = l.end.prev
-		l.end.next = nil
-		old.Clear()
-	}
-	l.cnt -= 1
-	return
-}
-
-func (l *List[LT]) PopIndex(number int) (result LT, ok bool) {
-	if l.start == nil || number >= l.Len() || (number < 0 && l.Len()+number < 0) {
-		return
-	}
-	// there are no options, only one possible index (border was checked on previous step)
-	if l.Len() == 1 {
-		n := l.start
-		l.start = nil
-		l.end = nil
-		l.cnt -= 1
-		n.Clear()
-		return n.data, true
-	}
-
-	if number < 0 {
-		number = l.Len() - 1 + number
-	}
-	n := l.start
-
-	var i = 0
-	for ; n != nil; n = n.next {
-		if number == i {
-			prev := n.prev
-			if prev != nil {
-				prev.next = n.next
-			} else {
-				l.start = n.next
+func (l *List[LT]) ReversedSeq() iter.Seq[LT] {
+	return func(yield func(LT) bool) {
+		if l.root == nil {
+			return
+		}
+		cur := l.root.prev
+		for i := 0; i < l.cnt; i++ {
+			if !yield(cur.data) {
+				return
 			}
-
-			next := n.next
-			if next != nil {
-				next.prev = n.prev
-			}
-
-			n.Clear()
-
-			l.cnt -= 1
-			return n.data, true
+			cur = cur.prev
 		}
-		i += 1
+		return
+	}
+}
+
+func (l *List[LT]) Seq2() iter.Seq2[int, LT] {
+	return func(yield func(int, LT) bool) {
+		if l.root == nil {
+			return
+		}
+		cur := l.root
+		for i := 0; i < l.cnt; i++ {
+			if !yield(i, cur.data) {
+				return
+			}
+			cur = cur.next
+		}
+		return
+	}
+}
+
+func (l *List[LT]) ReversedSeq2() iter.Seq2[int, LT] {
+	return func(yield func(int, LT) bool) {
+		if l.root == nil {
+			return
+		}
+		cur := l.root.prev
+		for i := 0; i < l.cnt; i++ {
+			if !yield(i, cur.data) {
+				return
+			}
+			cur = cur.prev
+		}
+		return
+	}
+}
+
+func (l *List[T]) PushFront(values ...T) {
+	for i := len(values) - 1; i >= 0; i-- {
+		l.cnt += 1
+		var newNode *element[T]
+		if l.root != nil {
+			newNode = &element[T]{data: values[i], next: l.root, prev: l.root.prev}
+			newNode.prev.next = newNode
+			l.root.prev = newNode
+		} else {
+			newNode = &element[T]{data: values[i]}
+			newNode.next = newNode
+			newNode.prev = newNode
+		}
+		l.root = newNode
 	}
 	return
 }
 
-func (l *List[LT]) PeakIndex(number int) (result LT, ok bool) {
-	if l.start == nil || number >= l.Len() || (number < 0 && l.Len()+number < 0) {
-		return
-	}
-	if number < 0 {
-		number = l.Len() - 1 + number
-	}
-	n := l.start
-
-	var i = 0
-	for ; n != nil; n = n.next {
-		if number == i {
-			return n.data, true
+func (l *List[T]) PushBack(values ...T) {
+	for _, v := range values {
+		l.cnt += 1
+		var newNode *element[T]
+		if l.root != nil {
+			last := l.root.prev
+			newNode = &element[T]{data: v, next: l.root, prev: last}
+			last.next = newNode
+			l.root.prev = newNode
+		} else {
+			newNode = &element[T]{data: v}
+			newNode.next = newNode
+			newNode.prev = newNode
+			l.root = newNode
 		}
-		i += 1
 	}
 	return
+}
+
+func (l *List[T]) AddAfterIndex(index int, values ...T) bool {
+	if l.root == nil || index < 0 || l.cnt <= index {
+		return false
+	}
+
+	var newNode *element[T]
+	// go to index node
+	current := l.root
+	for i := 0; i < index; i++ {
+		current = current.next
+	}
+
+	for _, v := range values {
+		l.cnt += 1
+		newNode = &element[T]{data: v}
+		newNode.next = current.next
+		newNode.prev = current
+		current.next = newNode
+		newNode.next.prev = newNode
+		current = newNode
+	}
+	return true
+}
+
+func (l *List[T]) AddBeforeIndex(index int, values ...T) bool {
+	if l.root == nil || index < 0 || l.cnt <= index {
+		return false
+	}
+
+	var newNode *element[T]
+	// go to index node
+	current := l.root
+	for i := 0; i < index; i++ {
+		current = current.next
+	}
+
+	for i := len(values) - 1; i >= 0; i-- {
+		l.cnt += 1
+		newNode = &element[T]{data: values[i]}
+		newNode.next = current
+		newNode.prev = current.prev
+		current.prev = newNode
+		newNode.prev.next = newNode
+		if current == l.root {
+			l.root = newNode
+		}
+		current = newNode
+	}
+	return true
+}
+
+func (l *List[T]) Front() (val T, exists bool) {
+	if l.root == nil {
+		exists = false
+	} else {
+		val = l.root.data
+		exists = true
+	}
+
+	return
+}
+
+func (l *List[T]) Back() (val T, exists bool) {
+	if l.root == nil {
+		exists = false
+	} else {
+		val = l.root.prev.data
+		exists = true
+	}
+
+	return
+}
+
+func (l *List[LT]) PeakAt(index int) (val LT, exists bool) {
+	if l.root == nil || index < 0 || l.cnt <= index {
+		exists = false
+		return
+	}
+
+	e := l.root
+	for i := 0; i < index; i++ {
+		e = e.next
+	}
+	val = e.data
+	exists = true
+	return
+}
+
+func (l *List[T]) PopAt(index int) (val T, exists bool) {
+	if l.root == nil || index < 0 || l.cnt <= index {
+		return val, false
+	}
+
+	l.cnt -= 1
+	e := l.root
+	if l.cnt == 0 {
+		l.root = nil
+	} else {
+		for i := 0; i < index; i++ {
+			e = e.next
+		}
+		e.prev.next = e.next
+		e.next.prev = e.prev
+		if e == l.root {
+			l.root = e.next
+		}
+	}
+	e.clear()
+
+	return e.data, true
+}
+
+func (l *List[T]) Delete(value T) bool {
+	if l.root == nil {
+		return false
+	}
+
+	idx := l.Index(value)
+	if idx < 0 {
+		return false
+	}
+	l.PopAt(idx)
+	return true
+}
+
+func (l *List[T]) PopFront() (val T, exists bool) {
+	if l.root == nil || l.cnt == 0 {
+		exists = false
+		return
+	}
+
+	l.cnt -= 1
+	r := l.root
+	next := r.next
+	next.prev = r.prev
+	if l.cnt == 0 {
+		l.root = nil
+	} else {
+		l.root = next
+	}
+	r.clear()
+
+	val = r.data
+	exists = true
+	return
+}
+
+func (l *List[T]) PopBack() (val T, exists bool) {
+	if l.root == nil || l.cnt == 0 {
+		exists = false
+		return
+	}
+
+	l.cnt -= 1
+	p := l.root.prev
+	prev := p.prev
+	p.prev = l.root
+	if l.cnt == 0 {
+		l.root = nil
+	} else {
+		l.root.prev = prev
+	}
+	p.clear()
+
+	val = p.data
+	exists = true
+	return
+}
+
+func (l *List[T]) Index(value T) int {
+	if l.root == nil || l.cnt == 0 {
+		return -1
+	}
+
+	e := l.root
+	for i := 0; i < l.cnt; i++ {
+		if e.data == value {
+			return i
+		}
+		e = e.next
+	}
+	return -1
+}
+
+func (l *List[T]) Contains(value T) bool {
+	return l.Index(value) > -1
+}
+
+func (l *List[T]) MoveAfter(from, to int) bool {
+	if l.root == nil || l.cnt == 0 || l.cnt == 1 || from < 0 || to < 0 || from >= l.cnt || to >= l.cnt {
+		return false
+	}
+	if from == to || from-to == 1 {
+		return true
+	}
+
+	v, exists := l.PeakAt(from)
+	if !exists {
+		return false
+	}
+	l.AddAfterIndex(to, v)
+	if to < from {
+		from++
+	}
+	l.PopAt(from)
+
+	return true
+}
+
+func (l *List[T]) MoveBefore(from, to int) bool {
+	if l.root == nil || l.cnt == 0 || l.cnt == 1 || from < 0 || to < 0 || from >= l.cnt || to >= l.cnt {
+		return false
+	}
+	if from == to || to-from == 1 {
+		return true
+	}
+
+	v, exists := l.PeakAt(from)
+	if !exists {
+		return false
+	}
+	l.AddBeforeIndex(to, v)
+	if to < from {
+		from++
+	}
+	l.PopAt(from)
+
+	return true
+}
+
+func (l *List[T]) Equal(other *List[T]) bool {
+	if l.Len() != other.Len() {
+		return false
+	}
+	if l.Len() == 0 {
+		return true
+	}
+
+	// Can't use .Index because of O^2
+	next, stop := iter.Pull(other.Seq())
+	for v := range l.Seq() {
+		o, exists := next()
+		if !exists {
+			stop()
+			return false
+		}
+		if o != v {
+			return false
+		}
+	}
+	return true
+}
+
+func (l *List[T]) Clone() *List[T] {
+	result := New[T]()
+	for v := range l.Seq() {
+		result.PushBack(v)
+	}
+	return result
 }

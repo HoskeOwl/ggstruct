@@ -1,88 +1,65 @@
 package queue
 
 import (
-	"fmt"
-	"strings"
+	"github.com/HoskeOwl/ggstruct/list"
 )
 
-type (
-	Queue[QT any] struct {
-		start, end *node[QT]
-		length     int
-	}
-	node[NT any] struct {
-		value NT
-		next  *node[NT]
-	}
-)
+type Queue[QT comparable] struct {
+	data  *list.List[QT]
+	Limit int
+}
 
-func New[T any](initial ...T) *Queue[T] {
-	q := &Queue[T]{}
-	for _, n := range initial {
-		q.Enqueue(n)
+func (q *Queue[QT]) WithLimit(limit int) *Queue[QT] {
+	q.Limit = limit
+	return q
+}
+
+func New[T comparable](initial ...T) *Queue[T] {
+	q := &Queue[T]{
+		data:  list.New[T](initial...),
+		Limit: 0,
 	}
 	return q
 }
 
-func (q *Queue[QT]) String() string {
-	if q.length < 1 {
-		return ""
-	}
-	var keys []string = make([]string, q.length)
-	n := q.start
-	var i int = 0
-	for {
-		keys[i] = fmt.Sprint(n.value)
-		i += 1
-		n = n.next
-		if n == nil {
-			break
-		}
-	}
-	return fmt.Sprintf("(%v)", strings.Join(keys, ", "))
+func (q *Queue[QT]) Dequeue() (value QT, exists bool) {
+	return q.data.PopFront()
 }
 
-// Take the next item off the front of the queue
-func (q *Queue[QT]) Dequeue() (res QT, exists bool) {
-	if q.length == 0 {
-		exists = false
-		return
-	}
-	exists = true
-	res = q.start.value
-	if q.length == 1 {
-		q.start = nil
-		q.end = nil
-	} else {
-		q.start = q.start.next
-	}
-	q.length--
-	return
+func (q *Queue[QT]) Delete(value QT) bool {
+	return q.data.Delete(value)
 }
 
-// Put an item on the end of a queue
-func (q *Queue[QT]) Enqueue(value QT) {
-	n := &node[QT]{value, nil}
-	if q.length == 0 {
-		q.start = n
-		q.end = n
-	} else {
-		q.end.next = n
-		q.end = n
+func (q *Queue[QT]) Enqueue(value QT) bool {
+	if q.Limit > 0 && q.data.Len()+1 > q.Limit {
+		return false
 	}
-	q.length++
+	q.data.PushBack(value)
+	return true
 }
 
 // Return the number of items in the queue
 func (q *Queue[QT]) Len() int {
-	return q.length
+	return q.data.Len()
 }
 
 // Return the first item in the queue without removing it
 func (q *Queue[QT]) Peek() (res QT, exists bool) {
-	if q.length == 0 {
-		exists = false
+	return q.data.Front()
+}
+
+func (q *Queue[QT]) Contains(value QT) bool {
+	return q.data.Contains(value)
+}
+
+func (q *Queue[QT]) Remove(value QT) {
+	idx := q.data.Index(value)
+	if idx == -1 {
 		return
 	}
-	return q.start.value, true
+	q.data.PopAt(idx)
+}
+
+func (q *Queue[QT]) Clear() {
+	q.data = list.New[QT]()
 }
