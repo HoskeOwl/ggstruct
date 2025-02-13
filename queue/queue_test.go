@@ -20,11 +20,15 @@ func (suite *QueueTestSuite) TestInit() {
 	suite.Require().Equal(0, q.Len())
 	suite.Require().True(q.data.Equal(list.New[int]()))
 
-	q = New[int](2)
+	q = New[int]()
+	q.Enqueue(2)
 	suite.Require().Equal(1, q.Len())
 	suite.Require().True(q.data.Equal(list.New[int](2)))
 
-	q = New[int](2, 3, 4)
+	q = New[int]()
+	q.Enqueue(2)
+	q.Enqueue(3)
+	q.Enqueue(4)
 	suite.Require().Equal(3, q.Len())
 	suite.Require().True(q.data.Equal(list.New[int](2, 3, 4)))
 }
@@ -34,10 +38,14 @@ func (suite *QueueTestSuite) TestLen() {
 	q = New[int]()
 	suite.Require().Equal(0, q.data.Len())
 
-	q = New[int](2)
+	q = New[int]()
+	q.Enqueue(2)
 	suite.Require().Equal(1, q.data.Len())
 
-	q = New[int](2, 3, 4)
+	q = New[int]()
+	q.Enqueue(2)
+	q.Enqueue(3)
+	q.Enqueue(4)
 	suite.Require().Equal(3, q.data.Len())
 	q.Dequeue()
 	suite.Require().Equal(2, q.data.Len())
@@ -51,17 +59,21 @@ func (suite *QueueTestSuite) TestInitLimit() {
 	var q *Queue[int]
 	q = New[int]().WithLimit(5)
 	suite.Require().Equal(0, q.Len())
-	suite.Require().Equal(5, q.Limit)
+	suite.Require().Equal(5, q.limit)
 	suite.Require().True(q.data.Equal(list.New[int]()))
 
-	q = New[int](2).WithLimit(5)
+	q = New[int]().WithLimit(5)
+	q.Enqueue(2)
 	suite.Require().Equal(1, q.Len())
-	suite.Require().Equal(5, q.Limit)
+	suite.Require().Equal(5, q.limit)
 	suite.Require().True(q.data.Equal(list.New[int](2)))
 
-	q = New[int](2, 3, 4).WithLimit(8)
+	q = New[int]().WithLimit(8)
+	q.Enqueue(2)
+	q.Enqueue(3)
+	q.Enqueue(4)
 	suite.Require().Equal(3, q.Len())
-	suite.Require().Equal(8, q.Limit)
+	suite.Require().Equal(8, q.limit)
 	suite.Require().True(q.data.Equal(list.New[int](2, 3, 4)))
 }
 
@@ -141,7 +153,11 @@ func (suite *QueueTestSuite) TestEnqueueWithLimit() {
 	suite.Require().True(q.data.Equal(list.New[int](5, 1)))
 
 	// yes, can be. Can't enqueue but can dequeue
-	q = New[int](1, 2, 3).WithLimit(1)
+	q = New[int]()
+	ok = q.Enqueue(4)
+	ok = q.Enqueue(5)
+	ok = q.Enqueue(6)
+	q.WithLimit(1)
 	ok = q.Enqueue(8)
 	suite.Require().False(ok)
 	suite.Require().Equal(3, q.Len())
@@ -165,7 +181,8 @@ func (suite *QueueTestSuite) TestDequeue() {
 	suite.Require().False(exists)
 	suite.Require().True(q.data.Equal(list.New[int]()))
 
-	q = New[int](1)
+	q = New[int]()
+	q.Enqueue(1)
 	value, exists = q.Dequeue()
 	suite.Require().Equal(value, 1)
 	suite.Require().True(exists)
@@ -175,7 +192,10 @@ func (suite *QueueTestSuite) TestDequeue() {
 	suite.Require().True(q.data.Equal(list.New[int]()))
 
 	expected := []int{1, 2, 3, 4, 5, 6}
-	q = New[int](expected...)
+	q = New[int]()
+	for _, n := range expected {
+		q.Enqueue(n)
+	}
 	for _, v := range expected {
 		value, exists = q.Dequeue()
 		suite.Require().Equal(value, v)
@@ -212,12 +232,16 @@ func (suite *QueueTestSuite) TestPeek() {
 	suite.Require().True(exists)
 	suite.Require().Equal(value, 2)
 
-	q = New[int](7)
+	q = New[int]()
+	q.Enqueue(7)
 	value, exists = q.Peek()
 	suite.Require().True(exists)
 	suite.Require().Equal(value, 7)
 
-	q = New[int](7, 8, 9)
+	q = New[int]()
+	q.Enqueue(7)
+	q.Enqueue(8)
+	q.Enqueue(9)
 	value, exists = q.Peek()
 	suite.Require().True(exists)
 	suite.Require().Equal(value, 7)

@@ -174,7 +174,7 @@ func (l *ListTestSuite) TestIteratorReversed() {
 
 	lst := New[int](dat...)
 	for i, v := range lst.ReversedSeq2() {
-		l.Require().Equal(exp[i], v)
+		l.Require().Equal(dat[i], v)
 	}
 
 	res := make([]int, 0, len(exp))
@@ -209,6 +209,45 @@ func (l *ListTestSuite) TestIndex() {
 
 	l.Require().Equal(-1, lst.Index(-12))
 	l.Require().Equal(-1, lst.Index(123))
+}
+
+func (l *ListTestSuite) TestRIndex() {
+	var dat = []int{1, 2, 3, 4, 5, 5, 5, 8, 9, 10, 11, 12, 2, 14, 15}
+
+	lst := New[int](dat...)
+
+	for _, v := range dat {
+		switch v {
+		case 2:
+			l.Require().Equal(12, lst.RIndex(v))
+		case 5:
+			l.Require().Equal(6, lst.RIndex(v))
+		default:
+			l.Require().Equal(v-1, lst.RIndex(v))
+		}
+	}
+
+	l.Require().Equal(-1, lst.RIndex(-12))
+	l.Require().Equal(-1, lst.RIndex(123))
+}
+
+func (l *ListTestSuite) TestFind() {
+	var dat = []int{1, 2, 3, 4, 5, 5, 5, 8, 9, 10, 11, 12, 13, 14, 15}
+
+	lst := New[int](dat...)
+
+	for _, v := range dat {
+		switch v {
+		case 5:
+			l.Require().Equal([]int{4, 5, 6}, lst.Find(v))
+		default:
+			l.Require().Equal([]int{v - 1}, lst.Find(v))
+		}
+	}
+
+	var empty []int
+	l.Require().Equal(empty, lst.Find(-12))
+	l.Require().Equal(empty, lst.Find(123))
 }
 
 func (l *ListTestSuite) TestEmptyIndex() {

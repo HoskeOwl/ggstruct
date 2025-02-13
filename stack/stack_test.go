@@ -51,17 +51,17 @@ func (s *StackTestSuite) TestInitLimit() {
 	var q *Stack[int]
 	q = New[int]().WithLimit(5)
 	s.Require().Equal(0, q.Len())
-	s.Require().Equal(5, q.Limit)
+	s.Require().Equal(5, q.limit)
 	s.Require().True(q.data.Equal(list.New[int]()))
 
 	q = New[int](2).WithLimit(5)
 	s.Require().Equal(1, q.Len())
-	s.Require().Equal(5, q.Limit)
+	s.Require().Equal(5, q.limit)
 	s.Require().True(q.data.Equal(list.New[int](2)))
 
 	q = New[int](2, 3, 4).WithLimit(8)
 	s.Require().Equal(3, q.Len())
-	s.Require().Equal(8, q.Limit)
+	s.Require().Equal(8, q.limit)
 	s.Require().True(q.data.Equal(list.New[int](2, 3, 4)))
 }
 
@@ -227,22 +227,22 @@ func (s *StackTestSuite) TestIsFull() {
 
 	q = New[int]()
 	s.Require().False(q.IsFull())
-	q.Limit = -1
+	q.limit = -1
 	s.Require().False(q.IsFull())
-	q.Limit = 1
+	q.limit = 1
 	s.Require().False(q.IsFull())
 
 	q = New(1, 2, 3, 4, 5)
 	s.Require().False(q.IsFull())
-	q.Limit = -1
+	q.limit = -1
 	s.Require().False(q.IsFull())
-	q.Limit = 10
+	q.limit = 10
 	s.Require().False(q.IsFull())
-	q.Limit = 1
+	q.limit = 1
 	s.Require().True(q.IsFull())
 
 	q = New[int]()
-	q.Limit = 1
+	q.limit = 1
 	s.Require().False(q.IsFull())
 	q.Push(1)
 	s.Require().True(q.IsFull())
@@ -250,7 +250,7 @@ func (s *StackTestSuite) TestIsFull() {
 	s.Require().False(q.IsFull())
 
 	q = New[int]()
-	q.Limit = 1
+	q.limit = 1
 	s.Require().False(q.IsFull())
 	q.Push(1)
 	s.Require().True(q.IsFull())

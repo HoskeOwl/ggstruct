@@ -1,3 +1,4 @@
+// Package set provides simple set with iterator
 package set
 
 import (
@@ -22,15 +23,8 @@ func New[T comparable](initial ...T) *Set[T] {
 	return s
 }
 
-func (s *Set[T]) ToSlice() []T {
-	result := make([]T, 0, len(s.hash))
-	for k := range s.hash {
-		result = append(result, k)
-	}
-	return result
-}
-
-func (s *Set[T]) Range() iter.Seq[T] {
+// Seq returns value-iterator.
+func (s *Set[T]) Seq() iter.Seq[T] {
 	return func(yield func(T) bool) {
 		for k := range s.hash {
 			if !yield(k) {
@@ -40,20 +34,20 @@ func (s *Set[T]) Range() iter.Seq[T] {
 	}
 }
 
-// Test to see whether or not the element is in the set
+// Contains checks is element in the set or not.
 func (s *Set[ST]) Contains(element ST) bool {
 	_, exists := s.hash[element]
 	return exists
 }
 
-// Add an element to the set
+// Insert adds an element to the set.
 func (s *Set[ST]) Insert(elements ...ST) {
 	for _, e := range elements {
 		s.hash[e] = empty{}
 	}
 }
 
-// Find the intersection of two sets
+// Intersection returns elements which are in both sets.
 func (s *Set[ST]) Intersection(set *Set[ST]) *Set[ST] {
 	n := make(map[ST]empty)
 
@@ -66,15 +60,16 @@ func (s *Set[ST]) Intersection(set *Set[ST]) *Set[ST] {
 	return &Set[ST]{n}
 }
 
+// SymmetricDifference returns unique elements for both sets.
 func (s *Set[ST]) SymmetricDifference(other *Set[ST]) (*Set[ST], *Set[ST]) {
 	left := New[ST]()
 	right := New[ST]()
-	for k := range s.Range() {
+	for k := range s.Seq() {
 		if !other.Contains(k) {
 			left.Insert(k)
 		}
 	}
-	for k := range other.Range() {
+	for k := range other.Seq() {
 		if !s.Contains(k) {
 			right.Insert(k)
 		}
@@ -82,12 +77,12 @@ func (s *Set[ST]) SymmetricDifference(other *Set[ST]) (*Set[ST], *Set[ST]) {
 	return left, right
 }
 
-// Find the difference between two sets
-func (s *Set[ST]) Difference(set *Set[ST]) *Set[ST] {
+// Difference returns unique elements for that set.
+func (s *Set[ST]) Difference(other *Set[ST]) *Set[ST] {
 	n := make(map[ST]empty)
 
 	for k := range s.hash {
-		if _, exists := set.hash[k]; !exists {
+		if _, exists := other.hash[k]; !exists {
 			n[k] = empty{}
 		}
 	}
@@ -95,12 +90,12 @@ func (s *Set[ST]) Difference(set *Set[ST]) *Set[ST] {
 	return &Set[ST]{n}
 }
 
-// Return the number of items in the set
+// Len returns number of items in the set.
 func (s *Set[ST]) Len() int {
 	return len(s.hash)
 }
 
-// Test whether or not this set is a subset of "set"
+// SubsetOf checks is this set a subset of "other".
 func (s *Set[ST]) SubsetOf(other *Set[ST]) bool {
 	if s.Len() == 0 || (other.Len() == 0 && s.Len() == 0) {
 		return true
@@ -117,7 +112,7 @@ func (s *Set[ST]) SubsetOf(other *Set[ST]) bool {
 	return true
 }
 
-// Test whether or not this set is a proper subset of "set"
+// ProperSubsetOf checks is this set a proper subset of "other".
 func (s *Set[ST]) ProperSubsetOf(other *Set[ST]) bool {
 	if s.Len() >= other.Len() {
 		return false
@@ -125,14 +120,14 @@ func (s *Set[ST]) ProperSubsetOf(other *Set[ST]) bool {
 	return s.SubsetOf(other)
 }
 
-// Remove an element from the set
+// Remove removes all element from the set. Missing elements do nothing.
 func (s *Set[ST]) Remove(elements ...ST) {
 	for _, element := range elements {
 		delete(s.hash, element)
 	}
 }
 
-// Find the union of two sets
+// Union returns all elements of both sets.
 func (s *Set[ST]) Union(set *Set[ST]) *Set[ST] {
 	n := make(map[ST]empty, set.Len()+s.Len())
 
@@ -146,12 +141,14 @@ func (s *Set[ST]) Union(set *Set[ST]) *Set[ST] {
 	return &Set[ST]{n}
 }
 
+// Clone returns a new set with same elements.
 func (s *Set[ST]) Clone() *Set[ST] {
 	return &Set[ST]{
 		hash: maps.Clone(s.hash),
 	}
 }
 
+// Equal return true if both sets have same elements.
 func (s *Set[ST]) Equal(other *Set[ST]) bool {
 	if s.Len() != other.Len() {
 		return false

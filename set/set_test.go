@@ -246,7 +246,7 @@ func (suite *setTestSuite) TestRange() {
 	set := New[int](expected...)
 
 	repeatCheck := make([]int, 0, len(expected))
-	for v := range set.Range() {
+	for v := range set.Seq() {
 		suite.Require().NotContains(repeatCheck, v)
 		suite.Require().Contains(expected, v)
 		repeatCheck = append(repeatCheck, v)
@@ -259,11 +259,12 @@ func remove(s []int, i int) []int {
 }
 
 func (suite *setTestSuite) TestToSlice() {
-	suite.Require().Equal([]int{}, New[int]().ToSlice())
+	var expected []int
+	suite.Require().Equal(expected, slices.Collect(New[int]().Seq()))
 
-	expected := []int{1, 2, 3, 4, 5, 6}
+	expected = []int{1, 2, 3, 4, 5, 6}
 	repeatCheck := make([]int, 0, len(expected))
-	dat := New(expected...).ToSlice()
+	dat := slices.Collect(New(expected...).Seq())
 	for _, v := range dat {
 		suite.Require().NotContains(repeatCheck, v)
 		suite.Require().Contains(expected, v)

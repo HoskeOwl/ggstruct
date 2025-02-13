@@ -1,3 +1,7 @@
+// Package trie provides unicode trie structure
+// could hold this one  (🦃) --> (🌯)
+//
+//	└ --> (🍖)
 package trie
 
 import (
@@ -68,6 +72,7 @@ func (t *Trie[V]) getNode(key string) *node[V] {
 	return cur
 }
 
+// Insert adds element to the three.
 func (t *Trie[V]) Insert(key string, value V) {
 	cur := t.root
 	for _, r := range key {
@@ -84,6 +89,7 @@ func (t *Trie[V]) Insert(key string, value V) {
 	t.valueLen++
 }
 
+// Search finds a node with value. If there is no node returns default value and 'false'.
 func (t *Trie[V]) Search(key string) (res V, exists bool) {
 	n := t.getNode(key)
 	if n == nil {
@@ -97,19 +103,23 @@ func (t *Trie[V]) Search(key string) (res V, exists bool) {
 	return *n.value, true
 }
 
+// Has returns 'true' if the three has a node with not nil value.
 func (t *Trie[V]) Has(key string) bool {
 	_, exists := t.Search(key)
 	return exists
 }
 
+// Len returns number of values.
 func (t *Trie[V]) Len() int {
 	return t.valueLen
 }
 
+// NodeLen returns number of nodes (with value and without).
 func (t *Trie[V]) NodeLen() int {
 	return t.nodesLen
 }
 
+// Remove removes node with value if exists. Also remove all empty upper nodes.
 func (t *Trie[V]) Remove(key string) (res V, exists bool) {
 	if t.valueLen == 0 {
 		exists = false
@@ -145,6 +155,7 @@ func (t *Trie[V]) Remove(key string) (res V, exists bool) {
 	}
 }
 
+// Clear removes all elements.
 func (t *Trie[V]) Clear() {
 	if t.valueLen == 0 {
 		return
