@@ -1,4 +1,4 @@
-# goCollectionsGeneric
+# ggstruct 
 Data structures has had made with generics:
 
 * list
