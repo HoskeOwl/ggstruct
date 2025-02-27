@@ -1,4 +1,4 @@
-// Package set provides simple set with iterator
+// Package set provides simple structure with iterator
 package set
 
 import (

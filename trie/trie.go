@@ -1,7 +1,5 @@
-// Package trie provides unicode trie structure
-// could hold this one  (🦃) --> (🌯)
-//
-//	└ --> (🍖)
+// Package trie provides structure with Unicode keys
+// could hold this one  (🦃) --> (🍖) --> (🌯)
 package trie
 
 import (

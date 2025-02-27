@@ -1,10 +1,26 @@
 # goCollectionsGeneric
 Data structures has had made with generics:
 
+* list
 * queue
 * set
 * stack
 * trie
+
+`list` and `set` have iterators - can be used with `range`.
+
+# Installation && import
+
+`go get github.com/HoskeOwl/ggstruct`
+
+`import "github.com/HoskeOwl/ggstruct`
+
+
+# Benefits
+1) No pointer conversions generics used (generic used). No manual type-checking. All structures can hold any `comparable` type.
+2) `list` and `set` have iterators. Can be used with `range`.
+3) `list` operate values not upper level objects like nodes.
+4) `trie` can operate with any string as a key (unicode-tolerance).
 
 ## Examples
 ### queue
@@ -14,7 +30,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/HoskeOwl/goCollectionsGeneric/queue"
+	"github.com/HoskeOwl/ggstruct/queue"
 )
 
 func main() {
@@ -26,10 +42,6 @@ func main() {
 	if val, exists := q.Peek(); exists {
 		fmt.Println(val)
 	}
-	q.Enqueue(12)
-	if val, exists := q.Dequeue(); exists {
-		fmt.Println(val)
-	}
 }
 ```
 ### set
@@ -39,7 +51,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/HoskeOwl/goCollectionsGeneric/set"
+	"github.com/HoskeOwl/ggstruct/set"
 )
 
 func main() {
@@ -47,10 +59,10 @@ func main() {
 	s1.Insert(1)
 	s1.Insert(2)
 	s1.Insert(3)
-	s2 := set.New[int]()
-	s2.Insert(3)
-	s2.Insert(4)
-	s2.Insert(5)
+    
+	s2 := set.New[int](3,4,5)
+    
+    
 	fmt.Println(s1.Difference(s2))
 	fmt.Println(s1.Union(s2))
 	fmt.Println(s1.Intersection(s2))
@@ -63,7 +75,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/HoskeOwl/goCollectionsGeneric/stack"
+	"github.com/HoskeOwl/ggstruct/stack"
 )
 
 func main() {

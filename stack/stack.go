@@ -1,4 +1,4 @@
-// Package stack provides simple stack
+// Package stack provides simple structure
 package stack
 
 import (

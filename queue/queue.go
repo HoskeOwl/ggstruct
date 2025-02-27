@@ -1,4 +1,4 @@
-// Package queue provides simple queue
+// Package queue provides simple structure
 package queue
 
 import (
