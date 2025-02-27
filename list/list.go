@@ -164,6 +164,11 @@ func (l *List[T]) PushBack(values ...T) {
 	return
 }
 
+// Add Add value to the end of the list. Same as PushBack.
+func (l *List[T]) Add(values ...T) {
+	l.PushBack(values...)
+}
+
 // AddAfterIndex Add value to the specific position.
 // If list is 1 <-> 2 <-> 3 <-> 4 then you call this function with index 2 (for example with value 9).
 // You will get 1 <-> 2 <-> 3 <-> 9 <-> 4
