@@ -23,6 +23,85 @@ Data structures has had made with generics:
 4) `trie` can operate with any string as a key (unicode-tolerance).
 
 ## Examples
+### set
+```golang
+package main
+
+import (
+	"fmt"
+
+	"github.com/HoskeOwl/ggstruct/set"
+)
+
+func main() {
+	s1 := set.New[int]()
+	s1.Insert(1)
+	s1.Insert(2)
+	s1.Insert(3)
+    
+	s2 := set.New(3,4,5)
+    
+    
+	fmt.Println(s1.Difference(s2))
+	fmt.Println(s1.Union(s2))
+	fmt.Println(s1.Intersection(s2))
+    for num := range s2.Seq(){
+        fmt.Println(num)
+    }
+}
+```
+### list
+```golang
+package main
+
+import (
+	"fmt"
+
+	"github.com/HoskeOwl/ggstruct/list"
+)
+
+func main() {
+	s1 := list.New[int]()
+	s1.Add(1)
+	s1.Add(2)
+	s1.Add(3)
+    
+	s2 := list.New(3,4,5)
+    
+    for num := range s2.Seq(){
+        fmt.Println(num)
+    }
+    
+	for i, num := range s2.Seq2(){
+		fmt.Printf("%d: %d", i, num)
+	}
+}
+```
+### stack
+```golang
+package main
+
+import (
+	"fmt"
+
+	"github.com/HoskeOwl/ggstruct/stack"
+)
+
+func main() {
+	st := stack.New[int]()
+	if _, exists := st.Top(); !exists {
+		fmt.Println("Empty")
+	}
+	st.Push(1)
+	if val, exists := st.Top(); exists {
+		fmt.Println(val)
+	}
+	st.Push(3)
+	if val, exists := st.Pop(); exists {
+		fmt.Println(val)
+	}
+}
+```
 ### queue
 ```golang
 package main
@@ -40,55 +119,6 @@ func main() {
 	}
 	q.Enqueue(34)
 	if val, exists := q.Peek(); exists {
-		fmt.Println(val)
-	}
-}
-```
-### set
-```golang
-package main
-
-import (
-	"fmt"
-
-	"github.com/HoskeOwl/ggstruct/set"
-)
-
-func main() {
-	s1 := set.New[int]()
-	s1.Insert(1)
-	s1.Insert(2)
-	s1.Insert(3)
-    
-	s2 := set.New[int](3,4,5)
-    
-    
-	fmt.Println(s1.Difference(s2))
-	fmt.Println(s1.Union(s2))
-	fmt.Println(s1.Intersection(s2))
-}
-```
-### stack
-```golang
-package main
-
-import (
-	"fmt"
-
-	"github.com/HoskeOwl/ggstruct/stack"
-)
-
-func main() {
-	st := stack.New[int]()
-	if _, exists := st.Peek(); !exists {
-		fmt.Println("Empty")
-	}
-	st.Push(1)
-	if val, exists := st.Peek(); exists {
-		fmt.Println(val)
-	}
-	st.Push(3)
-	if val, exists := st.Pop(); exists {
 		fmt.Println(val)
 	}
 }
