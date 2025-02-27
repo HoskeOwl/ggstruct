@@ -1,0 +1,251 @@
+<!DOCTYPE html><html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="theme-color" content="#375EAB"/>
+
+  <title>trie - Documentation</title>
+
+
+
+
+
+
+
+
+
+
+<link type="text/css" rel="stylesheet" href="../../../../../lib/style.css"/></head>
+<body>
+
+<div id="lowframe" style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../../../../">Documentation</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../../../../">Documentation</a></div>
+<!--<a href="#" id="menu-button"><span id="menu-button-arrow">▽</span></a>-->
+<div id="menu">
+<a href="../../../../../" style="margin-right: 10px;">Package Index</a>
+</div>
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Source file
+    <a href="/src">src</a>/<a href="../../../../../src/github.com.html">github.com</a>/<a href="../../../../../src/github.com/HoskeOwl">HoskeOwl</a>/<a href="../../../../../src/github.com/HoskeOwl/ggstruct">ggstruct</a>/<a href="../../../../../src/github.com/HoskeOwl/ggstruct/trie">trie</a>/<span class="text-muted">trie_test.go</span>
+  </h1>
+
+
+
+
+
+  <h2>
+    Documentation: <a href="../../../../../github.com/HoskeOwl/ggstruct/trie">github.com/HoskeOwl/ggstruct/trie</a>
+  </h2>
+
+
+
+<div id="nav"></div>
+
+
+
+<pre><span id="L1" class="ln">     1  </span>package trie
+<span id="L2" class="ln">     2  </span>
+<span id="L3" class="ln">     3  </span>import (
+<span id="L4" class="ln">     4  </span>	&#34;github.com/stretchr/testify/suite&#34;
+<span id="L5" class="ln">     5  </span>	&#34;testing&#34;
+<span id="L6" class="ln">     6  </span>)
+<span id="L7" class="ln">     7  </span>
+<span id="L8" class="ln">     8  </span>func TestTrie(t *testing.T) {
+<span id="L9" class="ln">     9  </span>	suite.Run(t, new(TrieStructTestSuite))
+<span id="L10" class="ln">    10  </span>}
+<span id="L11" class="ln">    11  </span>
+<span id="L12" class="ln">    12  </span>type TrieStructTestSuite struct {
+<span id="L13" class="ln">    13  </span>	suite.Suite
+<span id="L14" class="ln">    14  </span>}
+<span id="L15" class="ln">    15  </span>
+<span id="L16" class="ln">    16  </span>func (s *TrieStructTestSuite) TestLen() {
+<span id="L17" class="ln">    17  </span>	t := New[int]()
+<span id="L18" class="ln">    18  </span>	s.Equal(0, t.Len())
+<span id="L19" class="ln">    19  </span>	s.Equal(0, t.NodeLen())
+<span id="L20" class="ln">    20  </span>	t.Insert(&#34;35&#34;, 100)
+<span id="L21" class="ln">    21  </span>	s.Equal(1, t.Len())
+<span id="L22" class="ln">    22  </span>	s.Equal(2, t.NodeLen())
+<span id="L23" class="ln">    23  </span>	t.Insert(&#34;368&#34;, 120)
+<span id="L24" class="ln">    24  </span>	s.Equal(2, t.Len())
+<span id="L25" class="ln">    25  </span>	s.Equal(4, t.NodeLen())
+<span id="L26" class="ln">    26  </span>	t.Insert(&#34;3&#34;, 2)
+<span id="L27" class="ln">    27  </span>	s.Equal(3, t.Len())
+<span id="L28" class="ln">    28  </span>	s.Equal(4, t.NodeLen())
+<span id="L29" class="ln">    29  </span>
+<span id="L30" class="ln">    30  </span>	t.Remove(&#34;368&#34;)
+<span id="L31" class="ln">    31  </span>	s.Equal(2, t.Len())
+<span id="L32" class="ln">    32  </span>	s.Equal(2, t.NodeLen())
+<span id="L33" class="ln">    33  </span>}
+<span id="L34" class="ln">    34  </span>
+<span id="L35" class="ln">    35  </span>func (s *TrieStructTestSuite) TestNewFromMap() {
+<span id="L36" class="ln">    36  </span>	values := map[string]int{
+<span id="L37" class="ln">    37  </span>		&#34;ab&#34;:  12,
+<span id="L38" class="ln">    38  </span>		&#34;adc&#34;: 13,
+<span id="L39" class="ln">    39  </span>		&#34;ad&#34;:  14,
+<span id="L40" class="ln">    40  </span>	}
+<span id="L41" class="ln">    41  </span>	t := NewFromMap(values)
+<span id="L42" class="ln">    42  </span>
+<span id="L43" class="ln">    43  </span>	n, exists := t.root.leafs[&#39;a&#39;]
+<span id="L44" class="ln">    44  </span>	s.True(exists)
+<span id="L45" class="ln">    45  </span>	s.Nil(n.value)
+<span id="L46" class="ln">    46  </span>
+<span id="L47" class="ln">    47  </span>	l, exists := n.leafs[&#39;b&#39;]
+<span id="L48" class="ln">    48  </span>	s.True(exists)
+<span id="L49" class="ln">    49  </span>	s.Require().NotNil(l.value)
+<span id="L50" class="ln">    50  </span>	s.Equal(12, *l.value)
+<span id="L51" class="ln">    51  </span>
+<span id="L52" class="ln">    52  </span>	l, exists = n.leafs[&#39;d&#39;]
+<span id="L53" class="ln">    53  </span>	s.True(exists)
+<span id="L54" class="ln">    54  </span>	s.Require().NotNil(l.value)
+<span id="L55" class="ln">    55  </span>	s.Equal(14, *l.value)
+<span id="L56" class="ln">    56  </span>
+<span id="L57" class="ln">    57  </span>	l, exists = l.leafs[&#39;c&#39;]
+<span id="L58" class="ln">    58  </span>	s.True(exists)
+<span id="L59" class="ln">    59  </span>	s.Require().NotNil(l.value)
+<span id="L60" class="ln">    60  </span>	s.Equal(13, *l.value)
+<span id="L61" class="ln">    61  </span>}
+<span id="L62" class="ln">    62  </span>
+<span id="L63" class="ln">    63  </span>func (s *TrieStructTestSuite) TestInsert() {
+<span id="L64" class="ln">    64  </span>	t := New[int]()
+<span id="L65" class="ln">    65  </span>	t.Insert(&#34;🍿🌮🍖&#34;, 12)
+<span id="L66" class="ln">    66  </span>
+<span id="L67" class="ln">    67  </span>	a, exists := t.root.leafs[&#39;🍿&#39;]
+<span id="L68" class="ln">    68  </span>	s.Require().True(exists)
+<span id="L69" class="ln">    69  </span>	s.Require().Nil(a.value)
+<span id="L70" class="ln">    70  </span>
+<span id="L71" class="ln">    71  </span>	b, exists := a.leafs[&#39;🌮&#39;]
+<span id="L72" class="ln">    72  </span>	s.Require().True(exists)
+<span id="L73" class="ln">    73  </span>	s.Require().Nil(b.value)
+<span id="L74" class="ln">    74  </span>
+<span id="L75" class="ln">    75  </span>	c, exists := b.leafs[&#39;🍖&#39;]
+<span id="L76" class="ln">    76  </span>	s.Require().True(exists)
+<span id="L77" class="ln">    77  </span>	s.Require().NotNil(c.value)
+<span id="L78" class="ln">    78  </span>	s.Equal(12, *c.value)
+<span id="L79" class="ln">    79  </span>
+<span id="L80" class="ln">    80  </span>	t.Insert(&#34;🍿🌮&#34;, 25)
+<span id="L81" class="ln">    81  </span>	s.Require().NotNil(b.value)
+<span id="L82" class="ln">    82  </span>	s.Equal(25, *b.value)
+<span id="L83" class="ln">    83  </span>}
+<span id="L84" class="ln">    84  </span>
+<span id="L85" class="ln">    85  </span>func (s *TrieStructTestSuite) TestRemove() {
+<span id="L86" class="ln">    86  </span>	values := map[string]int{
+<span id="L87" class="ln">    87  </span>		&#34;ab&#34;:  12,
+<span id="L88" class="ln">    88  </span>		&#34;adc&#34;: 13,
+<span id="L89" class="ln">    89  </span>		&#34;adf&#34;: 14,
+<span id="L90" class="ln">    90  </span>	}
+<span id="L91" class="ln">    91  </span>	t := NewFromMap(values)
+<span id="L92" class="ln">    92  </span>
+<span id="L93" class="ln">    93  </span>	<span class="comment">// prepare</span>
+<span id="L94" class="ln">    94  </span>	a, exists := t.root.leafs[&#39;a&#39;]
+<span id="L95" class="ln">    95  </span>	s.Require().True(exists)
+<span id="L96" class="ln">    96  </span>	ab, exists := a.leafs[&#39;b&#39;]
+<span id="L97" class="ln">    97  </span>	s.Require().True(exists)
+<span id="L98" class="ln">    98  </span>	ad, exists := a.leafs[&#39;d&#39;]
+<span id="L99" class="ln">    99  </span>	s.Require().True(exists)
+<span id="L100" class="ln">   100  </span>	adc, exists := ad.leafs[&#39;c&#39;]
+<span id="L101" class="ln">   101  </span>	s.Require().True(exists)
+<span id="L102" class="ln">   102  </span>	adf, exists := ad.leafs[&#39;f&#39;]
+<span id="L103" class="ln">   103  </span>	s.Require().True(exists)
+<span id="L104" class="ln">   104  </span>	s.Equal(5, t.NodeLen())
+<span id="L105" class="ln">   105  </span>	s.Equal(3, t.Len())
+<span id="L106" class="ln">   106  </span>
+<span id="L107" class="ln">   107  </span>	<span class="comment">// start test</span>
+<span id="L108" class="ln">   108  </span>	t.Remove(&#34;ab&#34;)
+<span id="L109" class="ln">   109  </span>	_, exists = a.leafs[&#39;b&#39;]
+<span id="L110" class="ln">   110  </span>	s.False(exists)
+<span id="L111" class="ln">   111  </span>	s.Require().Nil(ab.value)
+<span id="L112" class="ln">   112  </span>	s.Equal(4, t.NodeLen())
+<span id="L113" class="ln">   113  </span>	s.Equal(2, t.Len())
+<span id="L114" class="ln">   114  </span>
+<span id="L115" class="ln">   115  </span>	t.Remove(&#34;adc&#34;)
+<span id="L116" class="ln">   116  </span>	_, exists = ad.leafs[&#39;c&#39;]
+<span id="L117" class="ln">   117  </span>	s.Require().Nil(adc.value)
+<span id="L118" class="ln">   118  </span>	s.Equal(3, t.NodeLen())
+<span id="L119" class="ln">   119  </span>	s.Equal(1, t.Len())
+<span id="L120" class="ln">   120  </span>
+<span id="L121" class="ln">   121  </span>	t.Remove(&#34;adf&#34;)
+<span id="L122" class="ln">   122  </span>	_, exists = ad.leafs[&#39;f&#39;]
+<span id="L123" class="ln">   123  </span>	s.Require().Nil(adf.value)
+<span id="L124" class="ln">   124  </span>	s.Equal(0, t.NodeLen())
+<span id="L125" class="ln">   125  </span>	s.Equal(0, t.Len())
+<span id="L126" class="ln">   126  </span>
+<span id="L127" class="ln">   127  </span>	s.Equal(0, len(t.root.leafs))
+<span id="L128" class="ln">   128  </span>}
+<span id="L129" class="ln">   129  </span>
+<span id="L130" class="ln">   130  </span>func (s *TrieStructTestSuite) TestSearchHas() {
+<span id="L131" class="ln">   131  </span>	values := map[string]int{
+<span id="L132" class="ln">   132  </span>		&#34;ab&#34;:  12,
+<span id="L133" class="ln">   133  </span>		&#34;adc&#34;: 13,
+<span id="L134" class="ln">   134  </span>		&#34;adf&#34;: 14,
+<span id="L135" class="ln">   135  </span>	}
+<span id="L136" class="ln">   136  </span>	t := NewFromMap(values)
+<span id="L137" class="ln">   137  </span>	_, exists := t.Search(&#34;qwerty&#34;)
+<span id="L138" class="ln">   138  </span>	s.False(exists)
+<span id="L139" class="ln">   139  </span>	s.False(t.Has(&#34;qwerty&#34;))
+<span id="L140" class="ln">   140  </span>
+<span id="L141" class="ln">   141  </span>	_, exists = t.Search(&#34;a&#34;)
+<span id="L142" class="ln">   142  </span>	s.False(exists)
+<span id="L143" class="ln">   143  </span>	s.False(t.Has(&#34;a&#34;))
+<span id="L144" class="ln">   144  </span>
+<span id="L145" class="ln">   145  </span>	_, exists = t.Search(&#34;adc&#34;)
+<span id="L146" class="ln">   146  </span>	s.True(exists)
+<span id="L147" class="ln">   147  </span>	s.True(t.Has(&#34;adc&#34;))
+<span id="L148" class="ln">   148  </span>}
+<span id="L149" class="ln">   149  </span>
+<span id="L150" class="ln">   150  </span>func (s *TrieStructTestSuite) TestClear() {
+<span id="L151" class="ln">   151  </span>	values := map[string]int{
+<span id="L152" class="ln">   152  </span>		&#34;ab&#34;:  12,
+<span id="L153" class="ln">   153  </span>		&#34;adc&#34;: 13,
+<span id="L154" class="ln">   154  </span>		&#34;adf&#34;: 14,
+<span id="L155" class="ln">   155  </span>	}
+<span id="L156" class="ln">   156  </span>	t := NewFromMap(values)
+<span id="L157" class="ln">   157  </span>
+<span id="L158" class="ln">   158  </span>	<span class="comment">// prepare</span>
+<span id="L159" class="ln">   159  </span>	a, exists := t.root.leafs[&#39;a&#39;]
+<span id="L160" class="ln">   160  </span>	s.Require().True(exists)
+<span id="L161" class="ln">   161  </span>	ab, exists := a.leafs[&#39;b&#39;]
+<span id="L162" class="ln">   162  </span>	s.Require().True(exists)
+<span id="L163" class="ln">   163  </span>	ad, exists := a.leafs[&#39;d&#39;]
+<span id="L164" class="ln">   164  </span>	s.Require().True(exists)
+<span id="L165" class="ln">   165  </span>	adc, exists := ad.leafs[&#39;c&#39;]
+<span id="L166" class="ln">   166  </span>	s.Require().True(exists)
+<span id="L167" class="ln">   167  </span>	adf, exists := ad.leafs[&#39;f&#39;]
+<span id="L168" class="ln">   168  </span>	s.Require().True(exists)
+<span id="L169" class="ln">   169  </span>	s.Equal(5, t.NodeLen())
+<span id="L170" class="ln">   170  </span>	s.Equal(3, t.Len())
+<span id="L171" class="ln">   171  </span>
+<span id="L172" class="ln">   172  </span>	<span class="comment">// start test</span>
+<span id="L173" class="ln">   173  </span>	t.Clear()
+<span id="L174" class="ln">   174  </span>	s.Equal(0, t.NodeLen())
+<span id="L175" class="ln">   175  </span>	s.Equal(0, t.Len())
+<span id="L176" class="ln">   176  </span>	s.Empty(a.leafs)
+<span id="L177" class="ln">   177  </span>	s.Nil(a.value)
+<span id="L178" class="ln">   178  </span>	s.Empty(ab.leafs)
+<span id="L179" class="ln">   179  </span>	s.Nil(ab.value)
+<span id="L180" class="ln">   180  </span>	s.Empty(adc.leafs)
+<span id="L181" class="ln">   181  </span>	s.Nil(adc.value)
+<span id="L182" class="ln">   182  </span>	s.Empty(adf.leafs)
+<span id="L183" class="ln">   183  </span>	s.Nil(adf.value)
+<span id="L184" class="ln">   184  </span>}
+<span id="L185" class="ln">   185  </span>
+</pre><p><a href="../../../../../src/github.com/HoskeOwl/ggstruct/trie/trie_test.go.html?m=text">View as plain text</a></p>
+
+<div id="footer"><a href="../../../../../docs.zip">Download docs.zip</a> to browse offline - Generated by <a href="https://godoc.org/golang.org/x/tools/godoc" target="_blank">godoc</a> + <a href="https://gitlab.com/tslocum/godoc-static" target="_blank">godoc-static</a></div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+
+
+</body></html>
