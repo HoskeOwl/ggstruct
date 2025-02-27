@@ -1,0 +1,386 @@
+<!DOCTYPE html><html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="theme-color" content="#375EAB"/>
+
+  <title>stack - Documentation</title>
+
+
+
+
+
+
+
+
+
+
+<link type="text/css" rel="stylesheet" href="../../../../lib/style.css"/></head>
+<body>
+
+<div id="lowframe" style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../../../">Documentation</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../../../">Documentation</a></div>
+<!--<a href="#" id="menu-button"><span id="menu-button-arrow">▽</span></a>-->
+<div id="menu">
+<a href="../../../../" style="margin-right: 10px;">Package Index</a>
+</div>
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package stack
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import &#34;<a href="https://github.com/HoskeOwl/ggstruct/tree/master/stack" target="_blank">github.com/HoskeOwl/ggstruct/stack</a>&#34;</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				<p>Package stack provides simple structure
+
+				
+			</p></div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+			
+			
+				
+				<dd><a href="#Stack">type Stack</a></dd>
+				
+					
+					<dd>    <a href="#New">func New[T comparable](initial ...T) *Stack[T]</a></dd>
+				
+				
+					
+					<dd>    <a href="#Stack.Clear">func (q *Stack[QT]) Clear()</a></dd>
+				
+					
+					<dd>    <a href="#Stack.Clone">func (q *Stack[QT]) Clone() *Stack[QT]</a></dd>
+				
+					
+					<dd>    <a href="#Stack.Contains">func (q *Stack[QT]) Contains(value QT) bool</a></dd>
+				
+					
+					<dd>    <a href="#Stack.IsEmpty">func (q *Stack[QT]) IsEmpty() bool</a></dd>
+				
+					
+					<dd>    <a href="#Stack.IsFull">func (q *Stack[QT]) IsFull() bool</a></dd>
+				
+					
+					<dd>    <a href="#Stack.Len">func (q *Stack[QT]) Len() int</a></dd>
+				
+					
+					<dd>    <a href="#Stack.Limit">func (s *Stack[QT]) Limit() int</a></dd>
+				
+					
+					<dd>    <a href="#Stack.Pop">func (q *Stack[QT]) Pop() (value QT, exists bool)</a></dd>
+				
+					
+					<dd>    <a href="#Stack.Push">func (q *Stack[QT]) Push(value QT) bool</a></dd>
+				
+					
+					<dd>    <a href="#Stack.Remove">func (q *Stack[QT]) Remove(value QT)</a></dd>
+				
+					
+					<dd>    <a href="#Stack.Top">func (q *Stack[QT]) Top() (res QT, exists bool)</a></dd>
+				
+					
+					<dd>    <a href="#Stack.WithLimit">func (q *Stack[QT]) WithLimit(limit int) *Stack[QT]</a></dd>
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html">stack.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+		
+		
+		
+			
+			
+			<h2 id="Stack">type <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=107:176#L1">Stack</a>
+				<a class="permalink" href="#Stack">¶</a>
+				
+				
+			</h2>
+			
+			<pre>type Stack[QT <a href="../../../../builtin/#comparable">comparable</a>] struct {
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="New">func <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=515:561#L14">New</a>
+					<a class="permalink" href="#New">¶</a>
+					
+					
+				</h3>
+				<pre>func New[T <a href="../../../../builtin/#comparable">comparable</a>](initial ...T) *<a href="#Stack">Stack</a>[T]</pre>
+				<p>New creates a new stack.
+
+				
+				
+			
+
+			
+				
+				</p><h3 id="Stack.Clear">func (*Stack[QT]) <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=1942:1969#L75">Clear</a>
+					<a class="permalink" href="#Stack.Clear">¶</a>
+					
+					
+				</h3>
+				<pre>func (q *<a href="#Stack">Stack</a>[QT]) Clear()</pre>
+				<p>Clear removes all elements from the stack.
+
+				
+				
+				
+			
+				
+				</p><h3 id="Stack.Clone">func (*Stack[QT]) <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=2069:2107#L80">Clone</a>
+					<a class="permalink" href="#Stack.Clone">¶</a>
+					
+					
+				</h3>
+				<pre>func (q *<a href="#Stack">Stack</a>[QT]) Clone() *<a href="#Stack">Stack</a>[QT]</pre>
+				<p>Clone returns a new stack with same elements with the same order.
+
+				
+				
+				
+			
+				
+				</p><h3 id="Stack.Contains">func (*Stack[QT]) <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=1641:1684#L61">Contains</a>
+					<a class="permalink" href="#Stack.Contains">¶</a>
+					
+					
+				</h3>
+				<pre>func (q *<a href="#Stack">Stack</a>[QT]) Contains(value QT) <a href="../../../../builtin/#bool">bool</a></pre>
+				<p>Contains returns &#39;true&#39; if the element is in the stack.
+
+				
+				
+				
+			
+				
+				</p><h3 id="Stack.IsEmpty">func (*Stack[QT]) <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=1271:1305#L46">IsEmpty</a>
+					<a class="permalink" href="#Stack.IsEmpty">¶</a>
+					
+					
+				</h3>
+				<pre>func (q *<a href="#Stack">Stack</a>[QT]) IsEmpty() <a href="../../../../builtin/#bool">bool</a></pre>
+				<p>IsEmpty returns &#39;true&#39; if no elements on the queue.
+
+				
+				
+				
+			
+				
+				</p><h3 id="Stack.IsFull">func (*Stack[QT]) <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=1061:1094#L37">IsFull</a>
+					<a class="permalink" href="#Stack.IsFull">¶</a>
+					
+					
+				</h3>
+				<pre>func (q *<a href="#Stack">Stack</a>[QT]) IsFull() <a href="../../../../builtin/#bool">bool</a></pre>
+				<p>IsFull returns &#39;true&#39; if elements count equal or greater than limit. With limit &lt;= 0 always return false.
+
+				
+				
+				
+			
+				
+				</p><h3 id="Stack.Len">func (*Stack[QT]) <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=1386:1415#L51">Len</a>
+					<a class="permalink" href="#Stack.Len">¶</a>
+					
+					
+				</h3>
+				<pre>func (q *<a href="#Stack">Stack</a>[QT]) Len() <a href="../../../../builtin/#int">int</a></pre>
+				<p>Len returns the number of items in the queue.
+
+				
+				
+				
+			
+				
+				</p><h3 id="Stack.Limit">func (*Stack[QT]) <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=231:262#L4">Limit</a>
+					<a class="permalink" href="#Stack.Limit">¶</a>
+					
+					
+				</h3>
+				<pre>func (s *<a href="#Stack">Stack</a>[QT]) Limit() <a href="../../../../builtin/#int">int</a></pre>
+				<p>Limit returns current maximum number of elements.
+
+				
+				
+				
+			
+				
+				</p><h3 id="Stack.Pop">func (*Stack[QT]) <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=687:736#L23">Pop</a>
+					<a class="permalink" href="#Stack.Pop">¶</a>
+					
+					
+				</h3>
+				<pre>func (q *<a href="#Stack">Stack</a>[QT]) Pop() (value QT, exists <a href="../../../../builtin/#bool">bool</a>)</pre>
+				<p>Pop removes and return the next element.
+
+				
+				
+				
+			
+				
+				</p><h3 id="Stack.Push">func (*Stack[QT]) <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=805:844#L28">Push</a>
+					<a class="permalink" href="#Stack.Push">¶</a>
+					
+					
+				</h3>
+				<pre>func (q *<a href="#Stack">Stack</a>[QT]) Push(value QT) <a href="../../../../builtin/#bool">bool</a></pre>
+				<p>Push adds a new element to stack.
+
+				
+				
+				
+			
+				
+				</p><h3 id="Stack.Remove">func (*Stack[QT]) <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=1779:1815#L66">Remove</a>
+					<a class="permalink" href="#Stack.Remove">¶</a>
+					
+					
+				</h3>
+				<pre>func (q *<a href="#Stack">Stack</a>[QT]) Remove(value QT)</pre>
+				<p>Remove removes the first equal element from the stack.
+
+				
+				
+				
+			
+				
+				</p><h3 id="Stack.Top">func (*Stack[QT]) <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=1506:1553#L56">Top</a>
+					<a class="permalink" href="#Stack.Top">¶</a>
+					
+					
+				</h3>
+				<pre>func (q *<a href="#Stack">Stack</a>[QT]) Top() (res QT, exists <a href="../../../../builtin/#bool">bool</a>)</pre>
+				<p>Top returns the first item in the stack without removing it.
+
+				
+				
+				
+			
+				
+				</p><h3 id="Stack.WithLimit">func (*Stack[QT]) <a href="../../../../src/github.com/HoskeOwl/ggstruct/stack/stack.go.html?s=403:454#L8">WithLimit</a>
+					<a class="permalink" href="#Stack.WithLimit">¶</a>
+					
+					
+				</h3>
+				<pre>func (q *<a href="#Stack">Stack</a>[QT]) WithLimit(limit <a href="../../../../builtin/#int">int</a>) *<a href="#Stack">Stack</a>[QT]</pre>
+				<p>WithLimit sets the maximum number of elements in the queue and returns pointer to itself.
+limit=0 mens no limits.
+
+				
+				
+				
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+</p><div id="footer"><a href="../../../../docs.zip">Download docs.zip</a> to browse offline - Generated by <a href="https://godoc.org/golang.org/x/tools/godoc" target="_blank">godoc</a> + <a href="https://gitlab.com/tslocum/godoc-static" target="_blank">godoc-static</a></div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+
+
+</body></html>

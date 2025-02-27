@@ -1,0 +1,242 @@
+<!DOCTYPE html><html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="theme-color" content="#375EAB"/>
+
+  <title>trie - Documentation</title>
+
+
+
+
+
+
+
+
+
+
+<link type="text/css" rel="stylesheet" href="../../../../../lib/style.css"/></head>
+<body>
+
+<div id="lowframe" style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../../../../">Documentation</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../../../../">Documentation</a></div>
+<!--<a href="#" id="menu-button"><span id="menu-button-arrow">▽</span></a>-->
+<div id="menu">
+<a href="../../../../../" style="margin-right: 10px;">Package Index</a>
+</div>
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Source file
+    <a href="/src">src</a>/<a href="../../../../../src/github.com.html">github.com</a>/<a href="../../../../../src/github.com/HoskeOwl">HoskeOwl</a>/<a href="../../../../../src/github.com/HoskeOwl/ggstruct">ggstruct</a>/<a href="../../../../../src/github.com/HoskeOwl/ggstruct/trie">trie</a>/<span class="text-muted">trie.go</span>
+  </h1>
+
+
+
+
+
+  <h2>
+    Documentation: <a href="../../../../../github.com/HoskeOwl/ggstruct/trie">github.com/HoskeOwl/ggstruct/trie</a>
+  </h2>
+
+
+
+<div id="nav"></div>
+
+
+
+<pre><span id="L1" class="ln">     1  </span><span class="comment">// Package trie provides structure with Unicode keys</span>
+<span id="L2" class="ln">     2  </span><span class="comment">// could hold this one  (🦃) --&gt; (🍖) --&gt; (🌯)</span>
+<span id="L3" class="ln">     3  </span>package trie
+<span id="L4" class="ln">     4  </span>
+<span id="L5" class="ln">     5  </span>import (
+<span id="L6" class="ln">     6  </span>	&#34;github.com/HoskeOwl/ggstruct/stack&#34;
+<span id="L7" class="ln">     7  </span>	&#34;maps&#34;
+<span id="L8" class="ln">     8  </span>	&#34;slices&#34;
+<span id="L9" class="ln">     9  </span>)
+<span id="L10" class="ln">    10  </span>
+<span id="L11" class="ln">    11  </span>type (
+<span id="L12" class="ln">    12  </span>	Trie[V any] struct {
+<span id="L13" class="ln">    13  </span>		root     *node[V]
+<span id="L14" class="ln">    14  </span>		valueLen int
+<span id="L15" class="ln">    15  </span>		nodesLen int
+<span id="L16" class="ln">    16  </span>	}
+<span id="L17" class="ln">    17  </span>	node[V any] struct {
+<span id="L18" class="ln">    18  </span>		key   rune
+<span id="L19" class="ln">    19  </span>		value *V
+<span id="L20" class="ln">    20  </span>		leafs map[rune]*node[V]
+<span id="L21" class="ln">    21  </span>		<span class="comment">//weights map[rune]int|float</span>
+<span id="L22" class="ln">    22  </span>		prev *node[V]
+<span id="L23" class="ln">    23  </span>	}
+<span id="L24" class="ln">    24  </span>)
+<span id="L25" class="ln">    25  </span>
+<span id="L26" class="ln">    26  </span>func (n *node[V]) Clear() {
+<span id="L27" class="ln">    27  </span>	n.value = nil
+<span id="L28" class="ln">    28  </span>	n.prev = nil
+<span id="L29" class="ln">    29  </span>	n.leafs = nil
+<span id="L30" class="ln">    30  </span>}
+<span id="L31" class="ln">    31  </span>
+<span id="L32" class="ln">    32  </span>func newNode[V any](key rune, prev *node[V]) *node[V] {
+<span id="L33" class="ln">    33  </span>	return &amp;node[V]{
+<span id="L34" class="ln">    34  </span>		key:   key,
+<span id="L35" class="ln">    35  </span>		value: nil,
+<span id="L36" class="ln">    36  </span>		leafs: make(map[rune]*node[V]),
+<span id="L37" class="ln">    37  </span>		prev:  prev,
+<span id="L38" class="ln">    38  </span>	}
+<span id="L39" class="ln">    39  </span>}
+<span id="L40" class="ln">    40  </span>
+<span id="L41" class="ln">    41  </span>func NewFromMap[V any](values map[string]V) *Trie[V] {
+<span id="L42" class="ln">    42  </span>	t := &amp;Trie[V]{
+<span id="L43" class="ln">    43  </span>		root:     newNode[V](rune(0), nil),
+<span id="L44" class="ln">    44  </span>		valueLen: 0,
+<span id="L45" class="ln">    45  </span>		nodesLen: 0,
+<span id="L46" class="ln">    46  </span>	}
+<span id="L47" class="ln">    47  </span>	for k, v := range values {
+<span id="L48" class="ln">    48  </span>		t.Insert(k, v)
+<span id="L49" class="ln">    49  </span>	}
+<span id="L50" class="ln">    50  </span>	return t
+<span id="L51" class="ln">    51  </span>}
+<span id="L52" class="ln">    52  </span>
+<span id="L53" class="ln">    53  </span>func New[V any]() *Trie[V] {
+<span id="L54" class="ln">    54  </span>	return &amp;Trie[V]{
+<span id="L55" class="ln">    55  </span>		root:     newNode[V](rune(0), nil),
+<span id="L56" class="ln">    56  </span>		valueLen: 0,
+<span id="L57" class="ln">    57  </span>		nodesLen: 0,
+<span id="L58" class="ln">    58  </span>	}
+<span id="L59" class="ln">    59  </span>}
+<span id="L60" class="ln">    60  </span>
+<span id="L61" class="ln">    61  </span>func (t *Trie[V]) getNode(key string) *node[V] {
+<span id="L62" class="ln">    62  </span>	cur := t.root
+<span id="L63" class="ln">    63  </span>	for _, r := range key {
+<span id="L64" class="ln">    64  </span>		if n, e := cur.leafs[r]; e {
+<span id="L65" class="ln">    65  </span>			cur = n
+<span id="L66" class="ln">    66  </span>		} else {
+<span id="L67" class="ln">    67  </span>			return nil
+<span id="L68" class="ln">    68  </span>		}
+<span id="L69" class="ln">    69  </span>	}
+<span id="L70" class="ln">    70  </span>	return cur
+<span id="L71" class="ln">    71  </span>}
+<span id="L72" class="ln">    72  </span>
+<span id="L73" class="ln">    73  </span><span class="comment">// Insert adds element to the three.</span>
+<span id="L74" class="ln">    74  </span>func (t *Trie[V]) Insert(key string, value V) {
+<span id="L75" class="ln">    75  </span>	cur := t.root
+<span id="L76" class="ln">    76  </span>	for _, r := range key {
+<span id="L77" class="ln">    77  </span>		if n, exists := cur.leafs[r]; exists {
+<span id="L78" class="ln">    78  </span>			cur = n
+<span id="L79" class="ln">    79  </span>		} else {
+<span id="L80" class="ln">    80  </span>			n = newNode(r, cur)
+<span id="L81" class="ln">    81  </span>			cur.leafs[r] = n
+<span id="L82" class="ln">    82  </span>			cur = n
+<span id="L83" class="ln">    83  </span>			t.nodesLen++
+<span id="L84" class="ln">    84  </span>		}
+<span id="L85" class="ln">    85  </span>	}
+<span id="L86" class="ln">    86  </span>	cur.value = &amp;value
+<span id="L87" class="ln">    87  </span>	t.valueLen++
+<span id="L88" class="ln">    88  </span>}
+<span id="L89" class="ln">    89  </span>
+<span id="L90" class="ln">    90  </span><span class="comment">// Search finds a node with value. If there is no node returns default value and &#39;false&#39;.</span>
+<span id="L91" class="ln">    91  </span>func (t *Trie[V]) Search(key string) (res V, exists bool) {
+<span id="L92" class="ln">    92  </span>	n := t.getNode(key)
+<span id="L93" class="ln">    93  </span>	if n == nil {
+<span id="L94" class="ln">    94  </span>		exists = false
+<span id="L95" class="ln">    95  </span>		return
+<span id="L96" class="ln">    96  </span>	}
+<span id="L97" class="ln">    97  </span>	if n.value == nil {
+<span id="L98" class="ln">    98  </span>		exists = false
+<span id="L99" class="ln">    99  </span>		return
+<span id="L100" class="ln">   100  </span>	}
+<span id="L101" class="ln">   101  </span>	return *n.value, true
+<span id="L102" class="ln">   102  </span>}
+<span id="L103" class="ln">   103  </span>
+<span id="L104" class="ln">   104  </span><span class="comment">// Has returns &#39;true&#39; if the three has a node with not nil value.</span>
+<span id="L105" class="ln">   105  </span>func (t *Trie[V]) Has(key string) bool {
+<span id="L106" class="ln">   106  </span>	_, exists := t.Search(key)
+<span id="L107" class="ln">   107  </span>	return exists
+<span id="L108" class="ln">   108  </span>}
+<span id="L109" class="ln">   109  </span>
+<span id="L110" class="ln">   110  </span><span class="comment">// Len returns number of values.</span>
+<span id="L111" class="ln">   111  </span>func (t *Trie[V]) Len() int {
+<span id="L112" class="ln">   112  </span>	return t.valueLen
+<span id="L113" class="ln">   113  </span>}
+<span id="L114" class="ln">   114  </span>
+<span id="L115" class="ln">   115  </span><span class="comment">// NodeLen returns number of nodes (with value and without).</span>
+<span id="L116" class="ln">   116  </span>func (t *Trie[V]) NodeLen() int {
+<span id="L117" class="ln">   117  </span>	return t.nodesLen
+<span id="L118" class="ln">   118  </span>}
+<span id="L119" class="ln">   119  </span>
+<span id="L120" class="ln">   120  </span><span class="comment">// Remove removes node with value if exists. Also remove all empty upper nodes.</span>
+<span id="L121" class="ln">   121  </span>func (t *Trie[V]) Remove(key string) (res V, exists bool) {
+<span id="L122" class="ln">   122  </span>	if t.valueLen == 0 {
+<span id="L123" class="ln">   123  </span>		exists = false
+<span id="L124" class="ln">   124  </span>		return
+<span id="L125" class="ln">   125  </span>	}
+<span id="L126" class="ln">   126  </span>
+<span id="L127" class="ln">   127  </span>	cur := t.getNode(key)
+<span id="L128" class="ln">   128  </span>	if cur == nil || cur.value == nil {
+<span id="L129" class="ln">   129  </span>		exists = false
+<span id="L130" class="ln">   130  </span>		return
+<span id="L131" class="ln">   131  </span>	}
+<span id="L132" class="ln">   132  </span>
+<span id="L133" class="ln">   133  </span>	res = *cur.value
+<span id="L134" class="ln">   134  </span>	cur.value = nil
+<span id="L135" class="ln">   135  </span>	t.valueLen--
+<span id="L136" class="ln">   136  </span>	exists = true
+<span id="L137" class="ln">   137  </span>
+<span id="L138" class="ln">   138  </span>	if len(cur.leafs) &gt; 0 {
+<span id="L139" class="ln">   139  </span>		<span class="comment">// keep for leafs</span>
+<span id="L140" class="ln">   140  </span>		t.valueLen--
+<span id="L141" class="ln">   141  </span>		return
+<span id="L142" class="ln">   142  </span>	}
+<span id="L143" class="ln">   143  </span>
+<span id="L144" class="ln">   144  </span>	for {
+<span id="L145" class="ln">   145  </span>		rm := cur
+<span id="L146" class="ln">   146  </span>		cur = cur.prev
+<span id="L147" class="ln">   147  </span>		delete(cur.leafs, rm.key)
+<span id="L148" class="ln">   148  </span>		t.nodesLen--
+<span id="L149" class="ln">   149  </span>		rm.Clear()
+<span id="L150" class="ln">   150  </span>		if cur == t.root || len(cur.leafs) != 0 || cur.value != nil {
+<span id="L151" class="ln">   151  </span>			return
+<span id="L152" class="ln">   152  </span>		}
+<span id="L153" class="ln">   153  </span>	}
+<span id="L154" class="ln">   154  </span>}
+<span id="L155" class="ln">   155  </span>
+<span id="L156" class="ln">   156  </span><span class="comment">// Clear removes all elements.</span>
+<span id="L157" class="ln">   157  </span>func (t *Trie[V]) Clear() {
+<span id="L158" class="ln">   158  </span>	if t.valueLen == 0 {
+<span id="L159" class="ln">   159  </span>		return
+<span id="L160" class="ln">   160  </span>	}
+<span id="L161" class="ln">   161  </span>
+<span id="L162" class="ln">   162  </span>	s := stack.New[*node[V]](slices.Collect(maps.Values(t.root.leafs))...)
+<span id="L163" class="ln">   163  </span>	for !s.IsEmpty() {
+<span id="L164" class="ln">   164  </span>		n, exists := s.Pop()
+<span id="L165" class="ln">   165  </span>		if !exists {
+<span id="L166" class="ln">   166  </span>			return
+<span id="L167" class="ln">   167  </span>		}
+<span id="L168" class="ln">   168  </span>		for _, v := range n.leafs {
+<span id="L169" class="ln">   169  </span>			s.Push(v)
+<span id="L170" class="ln">   170  </span>		}
+<span id="L171" class="ln">   171  </span>		n.Clear()
+<span id="L172" class="ln">   172  </span>	}
+<span id="L173" class="ln">   173  </span>	t.valueLen = 0
+<span id="L174" class="ln">   174  </span>	t.nodesLen = 0
+<span id="L175" class="ln">   175  </span>}
+<span id="L176" class="ln">   176  </span>
+</pre><p><a href="../../../../../src/github.com/HoskeOwl/ggstruct/trie/trie.go.html?m=text">View as plain text</a></p>
+
+<div id="footer"><a href="../../../../../docs.zip">Download docs.zip</a> to browse offline - Generated by <a href="https://godoc.org/golang.org/x/tools/godoc" target="_blank">godoc</a> + <a href="https://gitlab.com/tslocum/godoc-static" target="_blank">godoc-static</a></div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+
+
+</body></html>
