@@ -72,9 +72,9 @@ func main() {
         fmt.Println(num)
     }
     
-	for i, num := range s2.Seq2(){
-		fmt.Printf("%d: %d", i, num)
-	}
+    for i, num := range s2.Seq2(){
+        fmt.Printf("%d: %d", i, num)
+    }
 }
 ```
 ### stack
